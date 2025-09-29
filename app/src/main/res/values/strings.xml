@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Lista de Compras</string>
+
+    <!-- Mensagens de validação -->
+    <string name="erro_campo_vazio">Este campo é obrigatório</string>
+    <string name="erro_email_invalido">E-mail inválido</string>
+    <string name="erro_senhas_diferentes">As senhas não coincidem</string>
+
+    <!-- Mensagens de sucesso -->
+    <string name="conta_criada">Conta criada com sucesso!</string>
+    <string name="item_salvo">Item salvo!</string>
+    <string name="lista_criada">Lista criada!</string>
+
+    <!-- Botões e labels -->
+    <string name="entrar">Entrar</string>
+    <string name="cadastrar">Cadastrar</string>
+    <string name="salvar">Salvar</string>
+    <string name="novo_item">Novo Item</string>
+    <string name="nova_lista">Nova Lista</string>
+</resources>

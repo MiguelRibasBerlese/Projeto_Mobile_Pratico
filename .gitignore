@@ -1,0 +1,43 @@
+# Build outputs
+/build
+/app/build
+**/build/
+
+# Gradle
+.gradle/
+*.iml
+local.properties
+
+# Android Studio / IntelliJ
+.idea/
+.idea/caches
+.idea/libraries
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+
+# NDK / CMake
+.externalNativeBuild/
+.cxx/
+
+# Artifacts
+*.apk
+*.ap_
+*.aab
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+
+# Captures
+captures/
+
+# Keystores (não subir chaves privadas)
+*.jks
+*.keystore
+
+# VS Code (se alguém usar)
+.vscode/
