@@ -12,7 +12,7 @@
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/campoNome"
+            android:id="@+id/edtNome"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Nome do item"
@@ -25,7 +25,7 @@
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/campoQuantidade"
+            android:id="@+id/edtQuantidade"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Quantidade"
@@ -38,7 +38,7 @@
         android:layout_marginBottom="16dp">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/campoUnidade"
+            android:id="@+id/edtUnidade"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Unidade (kg, litros, unidades, etc.)"
@@ -53,7 +53,7 @@
         android:layout_marginBottom="8dp" />
 
     <Spinner
-        android:id="@+id/seletorCategoria"
+        android:id="@+id/spnCategoria"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_marginBottom="24dp" />
@@ -62,6 +62,6 @@
         android:id="@+id/btnSalvar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:text="@string/salvar" />
+        android:text="Salvar" />
 
 </LinearLayout>

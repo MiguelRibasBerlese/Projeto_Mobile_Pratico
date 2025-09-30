@@ -43,7 +43,7 @@ class ItemFormActivity : AppCompatActivity() {
         val categorias = Categoria.values().map { it.name }
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categorias)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        binding.seletorCategoria.adapter = adapter
+        binding.spnCategoria.adapter = adapter
     }
 
     private fun configurarBotaoSalvar() {
@@ -53,10 +53,10 @@ class ItemFormActivity : AppCompatActivity() {
     }
 
     private fun tentarSalvarItem() {
-        val nome = binding.campoNome.text.toString()
-        val quantidadeText = binding.campoQuantidade.text.toString()
-        val unidade = binding.campoUnidade.text.toString()
-        val categoriaSelecionada = binding.seletorCategoria.selectedItem as String
+        val nome = binding.edtNome.text.toString()
+        val quantidadeText = binding.edtQuantidade.text.toString()
+        val unidade = binding.edtUnidade.text.toString()
+        val categoriaSelecionada = binding.spnCategoria.selectedItem as String
 
         // valida os campos antes de salvar
         if (!validarCampos(nome, quantidadeText, unidade)) {

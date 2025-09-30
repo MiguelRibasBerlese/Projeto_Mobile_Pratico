@@ -3,7 +3,6 @@ package com.example.projetopratico_mobile1.ui.login
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import com.example.projetopratico_mobile1.R
 import com.example.projetopratico_mobile1.data.InMemoryStore
 import com.example.projetopratico_mobile1.databinding.ActivityLoginBinding
 import com.example.projetopratico_mobile1.ui.home.HomeActivity
@@ -22,10 +21,6 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        configurarCliques()
-    }
-
-    private fun configurarCliques() {
         // botão de entrar
         binding.btnEntrar.setOnClickListener {
             validarELogar()
