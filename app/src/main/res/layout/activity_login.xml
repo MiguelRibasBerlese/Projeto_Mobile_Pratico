@@ -22,7 +22,7 @@
         app:startIconDrawable="@android:drawable/ic_dialog_email">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/campoEmail"
+            android:id="@+id/edtEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Email"
@@ -37,7 +37,7 @@
         app:startIconDrawable="@android:drawable/ic_lock_lock">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/campoSenha"
+            android:id="@+id/edtSenha"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Senha"
@@ -49,7 +49,7 @@
         android:layout_width="match_parent"
         android:layout_height="56dp"
         android:layout_marginBottom="16dp"
-        android:text="@string/entrar" />
+        android:text="Entrar" />
 
     <TextView
         android:id="@+id/linkCadastro"

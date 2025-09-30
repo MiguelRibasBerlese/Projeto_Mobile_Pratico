@@ -21,6 +21,21 @@ class ItensAdapter(
     companion object {
         private const val TIPO_HEADER = 0
         private const val TIPO_ITEM = 1
+
+        // DiffUtil básico para o RecyclerView funcionar direito
+        object DiffCallback : DiffUtil.ItemCallback<Any>() {
+            override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
+                return when {
+                    oldItem is String && newItem is String -> oldItem == newItem
+                    oldItem is Item && newItem is Item -> oldItem.id == newItem.id
+                    else -> false
+                }
+            }
+
+            override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
+                return oldItem == newItem
+            }
+        }
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -82,21 +97,6 @@ class ItensAdapter(
             binding.chkComprado.setOnCheckedChangeListener { _, marcado ->
                 aoMarcarItem(item, marcado)
             }
-        }
-    }
-
-    // DiffUtil básico para o RecyclerView funcionar direito
-    companion object DiffCallback : DiffUtil.ItemCallback<Any>() {
-        override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
-            return when {
-                oldItem is String && newItem is String -> oldItem == newItem
-                oldItem is Item && newItem is Item -> oldItem.id == newItem.id
-                else -> false
-            }
-        }
-
-        override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
-            return oldItem == newItem
         }
     }
 }

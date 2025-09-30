@@ -34,7 +34,7 @@ class ListDetailActivity : AppCompatActivity() {
     private fun carregarLista() {
         val listaId = intent.getStringExtra("LISTA_ID")
         if (listaId != null) {
-            listaAtual = InMemoryStore.buscarLista(listaId)
+            listaAtual = InMemoryStore.listas.find { it.id == listaId }
             // define o título da tela
             title = listaAtual?.titulo ?: "Lista"
         }

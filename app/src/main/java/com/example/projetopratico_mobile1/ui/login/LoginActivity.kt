@@ -28,7 +28,7 @@ class LoginActivity : AppCompatActivity() {
     private fun configurarCliques() {
         // botão de entrar
         binding.btnEntrar.setOnClickListener {
-            tentarLogin()
+            validarELogar()
         }
 
         // link para cadastro
@@ -38,41 +38,28 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun tentarLogin() {
-        val email = binding.campoEmail.text.toString()
-        val senha = binding.campoSenha.text.toString()
+    private fun validarELogar() {
+        val email = binding.edtEmail.text.toString()
+        val senha = binding.edtSenha.text.toString()
 
-        // valida campos antes de tentar login
-        if (!validarCampos(email, senha)) {
+        if (!Validators.notBlank(email, senha)) {
+            binding.root.showToast("Preencha todos os campos")
             return
         }
 
-        // tenta fazer login
-        if (InMemoryStore.fazerLogin(email, senha)) {
-            binding.root.showToast("Login realizado!")
-            irParaHome()
-        } else {
-            binding.root.showToast("E-mail ou senha incorretos")
-        }
-    }
-
-    private fun validarCampos(email: String, senha: String): Boolean {
-        if (!Validators.notBlank(email, senha)) {
-            binding.root.showToast(getString(R.string.erro_campo_vazio))
-            return false
-        }
-
         if (!Validators.isEmailValid(email)) {
-            binding.root.showToast(getString(R.string.erro_email_invalido))
-            return false
+            binding.edtEmail.error = "Email inválido"
+            return
         }
 
-        return true
-    }
+        val user = InMemoryStore.users.firstOrNull { it.email.equals(email, true) && it.password == senha }
+        if (user == null) {
+            binding.edtSenha.error = "Credenciais inválidas"
+            return
+        }
 
-    private fun irParaHome() {
-        val intent = Intent(this, HomeActivity::class.java)
-        startActivity(intent)
-        finish() // remove da pilha para não voltar com back
+        InMemoryStore.currentUser = user
+        startActivity(Intent(this, HomeActivity::class.java))
+        finish()
     }
 }

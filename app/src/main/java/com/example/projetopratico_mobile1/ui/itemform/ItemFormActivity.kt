@@ -76,7 +76,7 @@ class ItemFormActivity : AppCompatActivity() {
         )
 
         // adiciona o item na lista
-        val lista = InMemoryStore.buscarLista(listaId!!)
+        val lista = InMemoryStore.listas.find { it.id == listaId }
         if (lista != null) {
             lista.itens.add(item)
             binding.root.showToast(getString(R.string.item_salvo))

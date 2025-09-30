@@ -45,7 +45,7 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun carregarListas() {
-        val listas = InMemoryStore.getListas()
+        val listas = InMemoryStore.listas
         adapter.submitList(listas)
 
         // se não tem listas, mostra uma dica
@@ -62,7 +62,7 @@ class HomeActivity : AppCompatActivity() {
             titulo = "Lista ${System.currentTimeMillis()}" // nome único baseado no tempo
         )
 
-        InMemoryStore.adicionarLista(novaLista)
+        InMemoryStore.listas.add(novaLista)
         binding.root.showToast("Lista criada!")
         carregarListas() // atualiza a lista
     }
