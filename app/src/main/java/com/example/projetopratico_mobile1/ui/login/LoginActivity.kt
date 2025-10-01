@@ -8,6 +8,7 @@ import com.example.projetopratico_mobile1.databinding.ActivityLoginBinding
 import com.example.projetopratico_mobile1.ui.home.HomeActivity
 import com.example.projetopratico_mobile1.util.Validators
 import com.example.projetopratico_mobile1.util.showToast
+import com.example.projetopratico_mobile1.util.hideKeyboard
 
 /**
  * Tela de login do usuário
@@ -33,27 +34,57 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Limpa os campos ao retornar para a tela
+        limparCampos()
+    }
+
+    private fun limparCampos() {
+        binding.edtEmail.text?.clear()
+        binding.edtSenha.text?.clear()
+        binding.edtEmail.error = null
+        binding.edtSenha.error = null
+    }
+
     private fun validarELogar() {
-        val email = binding.edtEmail.text.toString()
+        // Esconde o teclado ao validar
+        binding.root.hideKeyboard()
+
+        val email = binding.edtEmail.text.toString().trim()
         val senha = binding.edtSenha.text.toString()
 
-        if (!Validators.notBlank(email, senha)) {
-            binding.root.showToast("Preencha todos os campos")
+        // Limpa erros anteriores
+        binding.edtEmail.error = null
+        binding.edtSenha.error = null
+
+        if (email.isEmpty()) {
+            binding.edtEmail.error = "Campo obrigatório"
+            binding.edtEmail.requestFocus()
+            return
+        }
+
+        if (senha.isEmpty()) {
+            binding.edtSenha.error = "Campo obrigatório"
+            binding.edtSenha.requestFocus()
             return
         }
 
         if (!Validators.isEmailValid(email)) {
-            binding.edtEmail.error = "Email inválido"
+            binding.edtEmail.error = "E-mail inválido"
+            binding.edtEmail.requestFocus()
             return
         }
 
         val user = InMemoryStore.users.firstOrNull { it.email.equals(email, true) && it.password == senha }
         if (user == null) {
-            binding.edtSenha.error = "Credenciais inválidas"
+            binding.edtSenha.error = "Dados incorretos"
+            binding.edtSenha.requestFocus()
             return
         }
 
         InMemoryStore.currentUser = user
+        binding.root.showToast("Login realizado!")
         startActivity(Intent(this, HomeActivity::class.java))
         finish()
     }

@@ -3,7 +3,6 @@ package com.example.projetopratico_mobile1.ui.home
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.projetopratico_mobile1.data.InMemoryStore
 import com.example.projetopratico_mobile1.data.models.ShoppingList
 import com.example.projetopratico_mobile1.databinding.ActivityHomeBinding
@@ -15,67 +14,32 @@ import java.util.UUID
  * Tela principal que mostra as listas de compras do usuário
  */
 class HomeActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityHomeBinding
-    private lateinit var adapter: ListaComprasAdapter
+    private val adapter = ListaComprasAdapter { lista -> abrirDetalhe(lista) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        configurarRecyclerView()
-        configurarFab()
-        carregarListas()
-    }
-
-    private fun configurarRecyclerView() {
-        adapter = ListaComprasAdapter { lista ->
-            abrirDetalhesLista(lista)
-        }
-
-        binding.recycler.layoutManager = LinearLayoutManager(this)
         binding.recycler.adapter = adapter
-    }
-
-    private fun configurarFab() {
-        binding.fabAdd.setOnClickListener {
-            criarNovaLista()
-        }
-    }
-
-    private fun carregarListas() {
-        val listas = InMemoryStore.listas
-        adapter.submitList(listas)
-
-        // se não tem listas, mostra uma dica
-        if (listas.isEmpty()) {
-            binding.root.showToast("Toque no + para criar sua primeira lista!")
-        }
-    }
-
-    private fun criarNovaLista() {
-        // TODO: depois fazer um dialog para pedir o nome da lista
-        // por enquanto cria com nome padrão
-        val novaLista = ShoppingList(
-            id = UUID.randomUUID().toString(),
-            titulo = "Lista ${System.currentTimeMillis()}" // nome único baseado no tempo
-        )
-
-        InMemoryStore.listas.add(novaLista)
-        binding.root.showToast("Lista criada!")
-        carregarListas() // atualiza a lista
-    }
-
-    private fun abrirDetalhesLista(lista: ShoppingList) {
-        val intent = Intent(this, ListDetailActivity::class.java)
-        intent.putExtra("LISTA_ID", lista.id)
-        startActivity(intent)
+        atualizarLista()
+        // FAB para criar lista virá no C6
     }
 
     override fun onResume() {
         super.onResume()
-        // atualiza a lista quando volta de outras telas
-        carregarListas()
+        atualizarLista()
+    }
+
+    private fun atualizarLista() {
+        val ordenadas = InMemoryStore.listas.sortedBy { it.titulo.lowercase() }
+        adapter.submitList(ordenadas)
+    }
+
+    private fun abrirDetalhe(lista: ShoppingList) {
+        val i = Intent(this, ListDetailActivity::class.java)
+        i.putExtra("listaId", lista.id)
+        startActivity(i)
     }
 }

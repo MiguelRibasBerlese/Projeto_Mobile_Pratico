@@ -1,53 +1,46 @@
 package com.example.projetopratico_mobile1.ui.home
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.projetopratico_mobile1.R
 import com.example.projetopratico_mobile1.data.models.ShoppingList
 import com.example.projetopratico_mobile1.databinding.RowListaBinding
 
 /**
- * Adapter simples para mostrar as listas de compras
+ * Adapter para exibir listas de compras no RecyclerView
  */
 class ListaComprasAdapter(
-    private val aoClicarLista: (ShoppingList) -> Unit
-) : ListAdapter<ShoppingList, ListaComprasAdapter.ViewHolder>(DiffCallback) {
+    private val onClick: (ShoppingList) -> Unit
+) : ListAdapter<ShoppingList, ListaComprasAdapter.VH>(DIFF) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = RowListaBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding)
+    inner class VH(val binding: RowListaBinding) : RecyclerView.ViewHolder(binding.root)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+        val inf = RowListaBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return VH(inf)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
-    }
+    override fun onBindViewHolder(holder: VH, position: Int) {
+        val item = getItem(position)
+        holder.binding.txtTitulo.text = item.titulo
 
-    inner class ViewHolder(
-        private val binding: RowListaBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(lista: ShoppingList) {
-            binding.txtTitulo.text = lista.titulo
-
-            // TODO: depois implementar imagem da lista se tiver
-            // binding.imgThumb.setImageUri(lista.imagemUri)
-
-            binding.root.setOnClickListener {
-                aoClicarLista(lista)
-            }
-        }
-    }
-
-    // DiffUtil básico para o RecyclerView não ficar piscando
-    companion object DiffCallback : DiffUtil.ItemCallback<ShoppingList>() {
-        override fun areItemsTheSame(oldItem: ShoppingList, newItem: ShoppingList): Boolean {
-            return oldItem.id == newItem.id
+        if (item.imagemUri != null) {
+            holder.binding.imgThumb.setImageURI(Uri.parse(item.imagemUri))
+        } else {
+            holder.binding.imgThumb.setImageResource(R.drawable.ic_placeholder)
         }
 
-        override fun areContentsTheSame(oldItem: ShoppingList, newItem: ShoppingList): Boolean {
-            return oldItem == newItem
+        holder.itemView.setOnClickListener { onClick(item) }
+    }
+
+    companion object {
+        val DIFF = object : DiffUtil.ItemCallback<ShoppingList>() {
+            override fun areItemsTheSame(a: ShoppingList, b: ShoppingList) = a.id == b.id
+            override fun areContentsTheSame(a: ShoppingList, b: ShoppingList) = a == b
         }
     }
 }
