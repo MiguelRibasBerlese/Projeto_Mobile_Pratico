@@ -1,3 +1,7 @@
+#Grupo:
+#Octavio Santos Junqueira - 840755
+#Miguel Ribas Berlese - 839938
+
 # Lista de Compras - App Android
 
 App Android simples para gerenciar listas de compras com itens organizados por categoria.
