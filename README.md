@@ -1,6 +1,6 @@
-#Grupo:
-#Octavio Santos Junqueira - 840755
-#Miguel Ribas Berlese - 839938
+Grupo:
+Octavio Santos Junqueira - 840755
+Miguel Ribas Berlese - 839938
 
 # Lista de Compras - App Android
 
