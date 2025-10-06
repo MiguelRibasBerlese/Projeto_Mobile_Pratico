@@ -5,16 +5,56 @@
     <string name="erro_campo_vazio">Este campo é obrigatório</string>
     <string name="erro_email_invalido">E-mail inválido</string>
     <string name="erro_senhas_diferentes">As senhas não coincidem</string>
+    <string name="informe_nome">Informe o nome</string>
+    <string name="informe_quantidade">Informe a quantidade</string>
+    <string name="quantidade_maior_zero">Quantidade deve ser maior que 0</string>
+    <string name="selecione_categoria">Selecione uma categoria</string>
 
     <!-- Mensagens de sucesso -->
     <string name="conta_criada">Conta criada com sucesso!</string>
     <string name="item_salvo">Item salvo!</string>
     <string name="lista_criada">Lista criada!</string>
+    <string name="lista_atualizada">Lista atualizada!</string>
+    <string name="item_adicionado">Item adicionado!</string>
+    <string name="item_atualizado">Item atualizado!</string>
+    <string name="lista_excluida">Lista excluída</string>
+    <string name="item_marcado_comprado">Item marcado como comprado</string>
+    <string name="item_desmarcado">Item desmarcado</string>
 
-    <!-- Botões e labels -->
-    <string name="entrar">Entrar</string>
-    <string name="cadastrar">Cadastrar</string>
+    <!-- Labels e hints -->
+    <string name="buscar_listas">Buscar listas...</string>
+    <string name="buscar_itens">Buscar itens...</string>
+    <string name="nenhuma_lista_ainda">Nenhuma lista ainda</string>
+    <string name="sem_itens">Sem itens</string>
+    <string name="nome_da_lista">Nome da lista</string>
+    <string name="nome_do_item">Nome do item</string>
+    <string name="quantidade">Quantidade</string>
+    <string name="unidade_opcional">Unidade (opcional)</string>
+    <string name="categoria">Categoria</string>
+    <string name="imagem_opcional">Imagem opcional</string>
+
+    <!-- Botões -->
     <string name="salvar">Salvar</string>
-    <string name="novo_item">Novo Item</string>
-    <string name="nova_lista">Nova Lista</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="excluir">Excluir</string>
+    <string name="editar">Editar</string>
+    <string name="escolher_imagem">Escolher Imagem</string>
+    <string name="sair">Sair</string>
+
+    <!-- Diálogos -->
+    <string name="excluir_lista">Excluir Lista</string>
+    <string name="confirma_exclusao_lista">Tem certeza? Todos os itens da lista serão perdidos.</string>
+
+    <!-- Content descriptions -->
+    <string name="logo_content_desc">Logotipo – carrinho de compras</string>
+    <string name="logo_content_desc_blue">Logo do aplicativo - carrinho de compras azul</string>
+    <string name="adicionar_nova_lista">Adicionar nova lista</string>
+    <string name="adicionar_novo_item">Adicionar novo item</string>
+    <string name="thumbnail_da_lista">Thumbnail da lista</string>
+    <string name="icone_da_categoria">Ícone da categoria</string>
+    <string name="marcar_como_comprado">Marcar como comprado</string>
+    <string name="editar_lista">Editar lista</string>
+    <string name="excluir_lista_desc">Excluir lista</string>
+    <string name="preview_da_imagem">Preview da imagem</string>
+
 </resources>

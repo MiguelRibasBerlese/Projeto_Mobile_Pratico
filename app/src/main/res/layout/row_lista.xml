@@ -14,23 +14,48 @@
         android:padding="12dp"
         android:gravity="center_vertical">
 
-        <ImageView
-            android:id="@+id/imgThumb"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="12dp"
-            android:src="@drawable/ic_placeholder"
-            android:contentDescription="Thumbnail da lista"
-            android:scaleType="centerCrop" />
-
-        <TextView
-            android:id="@+id/txtTitulo"
+        <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Nome da Lista"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/txtTitulo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Nome da Lista"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/txtQuantidadeItens"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0 itens"
+                android:textSize="12sp"
+                android:textColor="@android:color/darker_gray" />
+
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnEditar"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="12dp"
+            android:padding="12dp"
+            android:src="@android:drawable/ic_menu_edit"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Editar lista" />
+
+        <ImageButton
+            android:id="@+id/btnExcluir"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:padding="12dp"
+            android:src="@android:drawable/ic_menu_delete"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Excluir lista" />
 
     </LinearLayout>
 

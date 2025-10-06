@@ -32,6 +32,11 @@
             android:name=".ui.home.HomeActivity"
             android:exported="false" />
 
+        <!-- Activity de Formulário de Lista -->
+        <activity
+            android:name=".ui.listform.ListFormActivity"
+            android:exported="false" />
+
         <!-- Activity de Detalhes da Lista -->
         <activity
             android:name=".ui.listdetail.ListDetailActivity"

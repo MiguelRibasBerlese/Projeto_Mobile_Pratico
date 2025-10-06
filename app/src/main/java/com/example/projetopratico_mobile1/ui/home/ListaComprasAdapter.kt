@@ -9,10 +9,12 @@ import com.example.projetopratico_mobile1.data.models.ShoppingList
 import com.example.projetopratico_mobile1.databinding.RowListaBinding
 
 /**
- * Adapter simples para mostrar as listas de compras
+ * Adapter para mostrar as listas de compras com ações
  */
 class ListaComprasAdapter(
-    private val aoClicarLista: (ShoppingList) -> Unit
+    private val aoClicarLista: (ShoppingList) -> Unit,
+    private val aoEditarLista: (ShoppingList) -> Unit,
+    private val aoExcluirLista: (ShoppingList) -> Unit
 ) : ListAdapter<ShoppingList, ListaComprasAdapter.ViewHolder>(DiffCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -30,17 +32,24 @@ class ListaComprasAdapter(
 
         fun bind(lista: ShoppingList) {
             binding.txtTitulo.text = lista.titulo
+            binding.txtQuantidadeItens.text = "${lista.itens.size} itens"
 
-            // TODO: depois implementar imagem da lista se tiver
-            // binding.imgThumb.setImageUri(lista.imagemUri)
-
+            // configura cliques
             binding.root.setOnClickListener {
                 aoClicarLista(lista)
+            }
+
+            binding.btnEditar.setOnClickListener {
+                aoEditarLista(lista)
+            }
+
+            binding.btnExcluir.setOnClickListener {
+                aoExcluirLista(lista)
             }
         }
     }
 
-    // DiffUtil básico para o RecyclerView não ficar piscando
+    // DiffUtil para o RecyclerView não ficar piscando
     companion object DiffCallback : DiffUtil.ItemCallback<ShoppingList>() {
         override fun areItemsTheSame(oldItem: ShoppingList, newItem: ShoppingList): Boolean {
             return oldItem.id == newItem.id

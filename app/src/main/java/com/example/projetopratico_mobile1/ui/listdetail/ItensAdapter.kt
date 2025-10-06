@@ -6,33 +6,42 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.projetopratico_mobile1.data.models.Item
+import com.example.projetopratico_mobile1.data.models.Categoria
 import com.example.projetopratico_mobile1.databinding.RowItemBinding
 import com.example.projetopratico_mobile1.databinding.RowItemHeaderBinding
 
+// sealed class para representar diferentes tipos de rows
+sealed class RowItem {
+    data class Header(val categoria: Categoria) : RowItem()
+    data class Produto(val item: Item) : RowItem()
+}
+
 /**
  * Adapter para mostrar itens com headers de categoria
- * Tem 2 tipos: header (String) e item (Item)
+ * Usa sealed class para tipos de row bem definidos
  */
 class ItensAdapter(
     private val aoClicarItem: (Item) -> Unit,
-    private val aoMarcarItem: (Item, Boolean) -> Unit
-) : ListAdapter<Any, RecyclerView.ViewHolder>(DiffCallback) {
+    private val aoToggleComprado: (Item) -> Unit
+) : ListAdapter<RowItem, RecyclerView.ViewHolder>(DiffCallback) {
 
     companion object {
         private const val TIPO_HEADER = 0
         private const val TIPO_ITEM = 1
 
-        // DiffUtil básico para o RecyclerView funcionar direito
-        object DiffCallback : DiffUtil.ItemCallback<Any>() {
-            override fun areItemsTheSame(oldItem: Any, newItem: Any): Boolean {
+        // DiffUtil para o RecyclerView funcionar direito
+        object DiffCallback : DiffUtil.ItemCallback<RowItem>() {
+            override fun areItemsTheSame(oldItem: RowItem, newItem: RowItem): Boolean {
                 return when {
-                    oldItem is String && newItem is String -> oldItem == newItem
-                    oldItem is Item && newItem is Item -> oldItem.id == newItem.id
+                    oldItem is RowItem.Header && newItem is RowItem.Header ->
+                        oldItem.categoria == newItem.categoria
+                    oldItem is RowItem.Produto && newItem is RowItem.Produto ->
+                        oldItem.item.id == newItem.item.id
                     else -> false
                 }
             }
 
-            override fun areContentsTheSame(oldItem: Any, newItem: Any): Boolean {
+            override fun areContentsTheSame(oldItem: RowItem, newItem: RowItem): Boolean {
                 return oldItem == newItem
             }
         }
@@ -40,9 +49,8 @@ class ItensAdapter(
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {
-            is String -> TIPO_HEADER
-            is Item -> TIPO_ITEM
-            else -> throw IllegalArgumentException("Tipo desconhecido")
+            is RowItem.Header -> TIPO_HEADER
+            is RowItem.Produto -> TIPO_ITEM
         }
     }
 
@@ -61,9 +69,9 @@ class ItensAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (holder) {
-            is HeaderViewHolder -> holder.bind(getItem(position) as String)
-            is ItemViewHolder -> holder.bind(getItem(position) as Item)
+        when (val item = getItem(position)) {
+            is RowItem.Header -> (holder as HeaderViewHolder).bind(item.categoria)
+            is RowItem.Produto -> (holder as ItemViewHolder).bind(item.item)
         }
     }
 
@@ -72,8 +80,8 @@ class ItensAdapter(
         private val binding: RowItemHeaderBinding
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(textoHeader: String) {
-            binding.txtHeader.text = textoHeader
+        fun bind(categoria: Categoria) {
+            binding.txtHeader.text = categoria.nome
         }
     }
 
@@ -84,18 +92,29 @@ class ItensAdapter(
 
         fun bind(item: Item) {
             // mostra nome, quantidade e unidade
-            binding.txtNome.text = "${item.nome} - ${item.quantidade} ${item.unidade}"
+            val unidadeText = if (item.unidade.isBlank()) "–" else item.unidade
+            binding.txtNome.text = "${item.nome} - ${item.quantidade} $unidadeText"
+            binding.txtCategoria.text = item.categoria.nome
             binding.chkComprado.isChecked = item.comprado
 
-            // TODO: colocar ícone da categoria na imgCat
+            // mapeia categoria para ícone
+            val iconeRes = when (item.categoria) {
+                Categoria.ALIMENTOS -> android.R.drawable.ic_menu_myplaces
+                Categoria.BEBIDAS -> android.R.drawable.ic_dialog_email
+                Categoria.HIGIENE -> android.R.drawable.ic_menu_preferences
+                Categoria.LIMPEZA -> android.R.drawable.ic_menu_crop
+                Categoria.OUTROS -> android.R.drawable.ic_menu_info_details
+                Categoria.COMPRADOS -> android.R.drawable.ic_menu_agenda
+            }
+            binding.imgCat.setImageResource(iconeRes)
 
             // configura os cliques
             binding.root.setOnClickListener {
                 aoClicarItem(item)
             }
 
-            binding.chkComprado.setOnCheckedChangeListener { _, marcado ->
-                aoMarcarItem(item, marcado)
+            binding.chkComprado.setOnCheckedChangeListener { _, _ ->
+                aoToggleComprado(item)
             }
         }
     }
