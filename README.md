@@ -29,14 +29,11 @@ Aplicativo para criar e gerenciar listas de compras, permitindo:
 
 ## 🏗️ Arquitetura
 
-**Padrão simples para trabalho acadêmico:**
 - **Activities + Intents:** Navegação entre telas
 - **ViewBinding:** Acesso seguro às views
 - **RecyclerView + DiffUtil:** Listas eficientes
 - **InMemoryStore (object):** Dados em RAM apenas
 - **ViewModels básicos:** Preservação de estado na rotação
-
-**Sem frameworks complexos:** Room, Retrofit, Navigation Component, DataStore, DI.
 
 ## 📱 Telas e Fluxos
 
@@ -75,11 +72,10 @@ Aplicativo para criar e gerenciar listas de compras, permitindo:
 
 **RF-001 - Gerenciar Listas:**
 - ✅ Criar, visualizar, editar, excluir listas
-- ✅ Imagem opcional nas listas
 - ✅ Ordenação A-Z por título
 
 **RF-002 - Gerenciar Itens:**
-- ✅ Adicionar itens com nome, quantidade, unidade, categoria
+- ✅ Adicionar itens com nome, quantidade, unidade, categoria(CRUD)
 - ✅ Editar e excluir itens
 - ✅ Validação de campos obrigatórios
 
@@ -164,17 +160,6 @@ binding = ActivityHomeBinding.inflate(layoutInflater)
 ## 📝 Notas de Desenvolvimento
 
 - Comentários em PT-BR para facilitar compreensão
-- Nomes de variáveis "humanos": `btnSalvar`, `edtNome`, `recycler`
 - Validações simples com feedback via Toast/Snackbar
 - Empty states para melhor UX
 - Tratamento básico de rotação com ViewModels
-- Sem overengineering - foco na simplicidade
-
-## 🔧 Próximos Passos (Possíveis Melhorias)
-
-- Persistência com Room Database
-- Sincronização com API REST
-- Notificações de lembrete
-- Compartilhamento de listas
-- Backup e restauração
-- Temas claro/escuro
