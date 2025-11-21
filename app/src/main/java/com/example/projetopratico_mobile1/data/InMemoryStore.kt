@@ -2,6 +2,8 @@ package com.example.projetopratico_mobile1.data
 
 import com.example.projetopratico_mobile1.data.models.User
 import com.example.projetopratico_mobile1.data.models.ShoppingList
+import com.example.projetopratico_mobile1.data.models.Item
+import com.example.projetopratico_mobile1.data.models.Categoria
 
 /**
  * Guarda todos os dados do app na memória
@@ -35,6 +37,35 @@ object InMemoryStore {
         val index = listas.indexOfFirst { it.id == lista.id }
         if (index != -1) {
             listas[index] = lista
+        }
+    }
+
+    // Função para criar dados de exemplo para testes
+    fun criarDadosExemplo() {
+        if (listas.isEmpty()) {
+            val lista1 = ShoppingList(
+                id = "lista1",
+                titulo = "Lista de Compras - Supermercado",
+                imagemUri = null,
+                itens = mutableListOf(
+                    Item("item1", "Arroz", 2.0, "kg", Categoria.ALIMENTOS, false),
+                    Item("item2", "Feijão", 1.0, "kg", Categoria.ALIMENTOS, false),
+                    Item("item3", "Leite", 3.0, "Uni", Categoria.BEBIDAS, false),
+                    Item("item4", "Sabonete", 2.0, "Uni", Categoria.HIGIENE, false)
+                )
+            )
+
+            val lista2 = ShoppingList(
+                id = "lista2",
+                titulo = "Produtos de Limpeza",
+                imagemUri = null,
+                itens = mutableListOf(
+                    Item("item5", "Detergente", 1.0, "Uni", Categoria.LIMPEZA, false),
+                    Item("item6", "Desinfetante", 500.0, "g", Categoria.LIMPEZA, false)
+                )
+            )
+
+            listas.addAll(listOf(lista1, lista2))
         }
     }
 }

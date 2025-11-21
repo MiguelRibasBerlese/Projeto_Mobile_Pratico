@@ -1,10 +1,13 @@
 package com.example.projetopratico_mobile1.ui.home
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.projetopratico_mobile1.R
 import com.example.projetopratico_mobile1.data.models.ShoppingList
 import com.example.projetopratico_mobile1.databinding.RowListaBinding
 
@@ -33,6 +36,22 @@ class ListaComprasAdapter(
         fun bind(lista: ShoppingList) {
             binding.txtTitulo.text = lista.titulo
             binding.txtQuantidadeItens.text = "${lista.itens.size} itens"
+
+            // Configurar imagem da lista - placeholder conforme especificação
+            val uri = lista.imagemUri
+            if (!uri.isNullOrBlank()) {
+                try {
+                    binding.imgLista.setImageURI(Uri.parse(uri))
+                    binding.imgLista.scaleType = ImageView.ScaleType.CENTER_CROP
+                } catch (e: Exception) {
+                    // URI inválida, usar placeholder
+                    binding.imgLista.setImageResource(android.R.drawable.ic_menu_gallery)
+                    binding.imgLista.scaleType = ImageView.ScaleType.CENTER_CROP
+                }
+            } else {
+                binding.imgLista.setImageResource(android.R.drawable.ic_menu_gallery)
+                binding.imgLista.scaleType = ImageView.ScaleType.CENTER_CROP
+            }
 
             // configura cliques
             binding.root.setOnClickListener {

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projetopratico_mobile1.databinding.ActivityLoginBinding
+import com.example.projetopratico_mobile1.data.InMemoryStore
 import com.example.projetopratico_mobile1.data.auth.AuthManager
 import com.example.projetopratico_mobile1.data.auth.AuthResult
 import com.example.projetopratico_mobile1.ui.home.HomeActivity
@@ -33,8 +34,13 @@ class LoginActivity : AppCompatActivity() {
 
         when (val result = AuthManager.signIn(email, senha)) {
             is AuthResult.Ok -> {
-                // Login bem-sucedido, navegar para HomeActivity
-                startActivity(Intent(this, HomeActivity::class.java))
+                // Login bem-sucedido, criar dados de exemplo se necessário
+                InMemoryStore.criarDadosExemplo()
+
+                // Navegar para HomeActivity
+                val intent = Intent(this, HomeActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
                 finish()
             }
             is AuthResult.Error -> {
