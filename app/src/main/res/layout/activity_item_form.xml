@@ -48,18 +48,23 @@
                 android:inputType="number" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <Button
-            android:id="@+id/btnUnidade"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilUnidade"
             android:layout_width="0dp"
-            android:layout_height="56dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
-            android:layout_gravity="bottom"
-            android:paddingHorizontal="24dp"
-            android:text="Unidade"
-            android:textSize="16sp"
-            android:textAllCaps="false"
-            style="@style/Widget.Material3.Button" />
+            android:hint="Unidade"
+            style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox.ExposedDropdownMenu">
+
+            <AutoCompleteTextView
+                android:id="@+id/edtUnidade"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="none"
+                android:focusable="false" />
+
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 

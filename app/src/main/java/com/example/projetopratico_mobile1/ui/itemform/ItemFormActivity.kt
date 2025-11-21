@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projetopratico_mobile1.data.InMemoryStore
 import com.example.projetopratico_mobile1.data.models.Item
@@ -24,10 +23,10 @@ class ItemFormActivity : AppCompatActivity() {
     private var listaId: String? = null
     private var itemId: String? = null
     private var categoriaSelecionada: Categoria? = null
-    private var unidadeSelecionada: String = "Unidade"
+    private var unidadeSelecionada: String = ""
 
-    // Opções de unidade disponíveis
-    private val opcoesUnidade = arrayOf("Unidade", "Gramas (g)", "Kilogramas (kg)")
+    // Opções de unidade conforme especificação
+    private val opcoesUnidade = arrayOf("un", "kg", "g", "L", "mL", "cx", "pct")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,19 +88,18 @@ class ItemFormActivity : AppCompatActivity() {
             salvarItem()
         }
 
-        binding.btnUnidade.setOnClickListener {
-            mostrarDialogoUnidade()
-        }
+        configurarDropdownUnidade()
     }
 
-    private fun mostrarDialogoUnidade() {
-        AlertDialog.Builder(this)
-            .setTitle("Selecione")
-            .setItems(opcoesUnidade) { _, which ->
-                unidadeSelecionada = opcoesUnidade[which]
-                binding.btnUnidade.text = unidadeSelecionada
-            }
-            .show()
+    private fun configurarDropdownUnidade() {
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, opcoesUnidade)
+        binding.edtUnidade.setAdapter(adapter)
+
+        // listener para capturar seleção
+        binding.edtUnidade.setOnItemClickListener { _, _, position, _ ->
+            unidadeSelecionada = opcoesUnidade[position]
+            binding.tilUnidade.error = null // limpa erro se houver
+        }
     }
 
     private fun carregarDados() {
@@ -113,14 +111,9 @@ class ItemFormActivity : AppCompatActivity() {
                 binding.edtNome.setText(it.nome)
                 binding.edtQuantidade.setText(it.quantidade.toString())
 
-                // Converte a abreviação armazenada para o texto completo no botão
-                unidadeSelecionada = when (it.unidade) {
-                    "Uni" -> "Unidade"
-                    "g" -> "Gramas (g)"
-                    "kg" -> "Kilogramas (kg)"
-                    else -> if (it.unidade.isNotEmpty()) it.unidade else "Unidade"
-                }
-                binding.btnUnidade.text = unidadeSelecionada
+                // Define a unidade no dropdown
+                unidadeSelecionada = it.unidade
+                binding.edtUnidade.setText(it.unidade, false) // false = não dispara listener
 
                 // seleciona categoria no spinner
                 val categorias = Categoria.values().filter { cat -> cat != Categoria.COMPRADOS }
@@ -161,13 +154,15 @@ class ItemFormActivity : AppCompatActivity() {
             return
         }
 
-        // Converte a unidade selecionada para abreviação
-        val unidadeAbreviada = when (unidadeSelecionada) {
-            "Unidade" -> "Uni"
-            "Gramas (g)" -> "g"
-            "Kilogramas (kg)" -> "kg"
-            else -> unidadeSelecionada
+        // Validação de unidade obrigatória
+        if (unidadeSelecionada.isEmpty()) {
+            binding.tilUnidade.error = "Selecione uma unidade"
+            binding.edtUnidade.requestFocus()
+            return
         }
+
+        // Unidade já está na forma final (un, kg, g, etc.)
+        val unidadeFinal = unidadeSelecionada
 
         try {
             val lista = InMemoryStore.buscarLista(listaId!!) ?: return
@@ -179,7 +174,7 @@ class ItemFormActivity : AppCompatActivity() {
                     val itemAtualizado = lista.itens[itemIndex].copy(
                         nome = nome,
                         quantidade = quantidade,
-                        unidade = unidadeAbreviada,
+                        unidade = unidadeFinal,
                         categoria = categoriaSelecionada!!
                     )
                     lista.itens[itemIndex] = itemAtualizado
@@ -191,7 +186,7 @@ class ItemFormActivity : AppCompatActivity() {
                     id = UUID.randomUUID().toString(),
                     nome = nome,
                     quantidade = quantidade,
-                    unidade = unidadeAbreviada,
+                    unidade = unidadeFinal,
                     categoria = categoriaSelecionada!!,
                     comprado = false
                 )

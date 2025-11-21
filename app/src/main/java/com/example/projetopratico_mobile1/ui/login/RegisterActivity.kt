@@ -1,10 +1,13 @@
 package com.example.projetopratico_mobile1.ui.login
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.projetopratico_mobile1.databinding.ActivityRegisterBinding
+import com.example.projetopratico_mobile1.data.InMemoryStore
 import com.example.projetopratico_mobile1.data.auth.AuthManager
 import com.example.projetopratico_mobile1.data.auth.AuthResult
+import com.example.projetopratico_mobile1.ui.home.HomeActivity
 import com.example.projetopratico_mobile1.util.showToast
 
 class RegisterActivity : AppCompatActivity() {
@@ -27,8 +30,13 @@ class RegisterActivity : AppCompatActivity() {
 
             when (val result = AuthManager.signUp(nome, email, senha, confirma)) {
                 is AuthResult.Ok -> {
-                    // Cadastro bem-sucedido
+                    // Cadastro bem-sucedido - criar dados de exemplo e navegar para HomeActivity
                     binding.root.showToast("Conta criada com sucesso!")
+                    InMemoryStore.criarDadosExemplo()
+
+                    val intent = Intent(this, HomeActivity::class.java)
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    startActivity(intent)
                     finish()
                 }
                 is AuthResult.Error -> {

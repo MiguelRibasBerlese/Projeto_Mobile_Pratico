@@ -52,6 +52,18 @@ class HomeActivity : AppCompatActivity() {
         carregarListas()
     }
 
+    override fun onStart() {
+        super.onStart()
+        // Auth guard - verifica se usuário está logado
+        if (InMemoryStore.currentUser == null) {
+            val intent = Intent(this, LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+            finish()
+            return
+        }
+    }
+
     private fun configurarToolbar() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(false)
