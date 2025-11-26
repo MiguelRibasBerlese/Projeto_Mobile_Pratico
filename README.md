@@ -160,7 +160,6 @@ binding = ActivityHomeBinding.inflate(layoutInflater)
 ## 📝 Notas de Desenvolvimento
 
 - Comentários em PT-BR para facilitar compreensão
-- Nomes de variáveis "humanos": `btnSalvar`, `edtNome`, `recycler`
 - Validações simples com feedback via Toast/Snackbar
 - Empty states para melhor UX
 - Tratamento básico de rotação com ViewModels
