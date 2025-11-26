@@ -7,10 +7,16 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.launch
 import com.example.projetopratico_mobile1.data.InMemoryStore
 import com.example.projetopratico_mobile1.data.models.Item
 import com.example.projetopratico_mobile1.data.models.Categoria
+import com.example.projetopratico_mobile1.data.repo.InMemoryItemRepository
 import com.example.projetopratico_mobile1.databinding.ActivityItemFormBinding
 import java.util.UUID
 
@@ -24,6 +30,9 @@ class ItemFormActivity : AppCompatActivity() {
     private var itemId: String? = null
     private var categoriaSelecionada: Categoria? = null
     private var unidadeSelecionada: String = ""
+
+    // ViewModel para gerenciar itens (será inicializado após obter listaId)
+    private lateinit var itemViewModel: ItemViewModel
 
     // Opções de unidade conforme especificação
     private val opcoesUnidade = arrayOf("un", "kg", "g", "L", "mL", "cx", "pct")
@@ -41,10 +50,18 @@ class ItemFormActivity : AppCompatActivity() {
             return
         }
 
+        // Inicializar ViewModel após obter listaId
+        inicializarViewModel()
+
         configurarTela()
         configurarSpinner()
         configurarEventos()
         carregarDados()
+    }
+
+    private fun inicializarViewModel() {
+        val factory = ItemViewModelFactory(InMemoryItemRepository(), listaId!!)
+        itemViewModel = factory.create(ItemViewModel::class.java)
     }
 
     private fun configurarTela() {
@@ -165,23 +182,20 @@ class ItemFormActivity : AppCompatActivity() {
         val unidadeFinal = unidadeSelecionada
 
         try {
-            val lista = InMemoryStore.buscarLista(listaId!!) ?: return
-
             if (itemId != null) {
-                // edição
-                val itemIndex = lista.itens.indexOfFirst { it.id == itemId }
-                if (itemIndex != -1) {
-                    val itemAtualizado = lista.itens[itemIndex].copy(
-                        nome = nome,
-                        quantidade = quantidade,
-                        unidade = unidadeFinal,
-                        categoria = categoriaSelecionada!!
-                    )
-                    lista.itens[itemIndex] = itemAtualizado
-                    Toast.makeText(this, "Item atualizado!", Toast.LENGTH_SHORT).show()
-                }
+                // edição - atualizar item existente
+                val itemAtualizado = Item(
+                    id = itemId!!,
+                    nome = nome,
+                    quantidade = quantidade,
+                    unidade = unidadeFinal,
+                    categoria = categoriaSelecionada!!,
+                    comprado = false // mantem como false na edição
+                )
+                itemViewModel.updateItem(itemAtualizado)
+                Toast.makeText(this, "Item atualizado!", Toast.LENGTH_SHORT).show()
             } else {
-                // criação
+                // criação - novo item
                 val novoItem = Item(
                     id = UUID.randomUUID().toString(),
                     nome = nome,
@@ -190,7 +204,7 @@ class ItemFormActivity : AppCompatActivity() {
                     categoria = categoriaSelecionada!!,
                     comprado = false
                 )
-                lista.itens.add(novoItem)
+                itemViewModel.addItem(novoItem)
                 Toast.makeText(this, "Item adicionado!", Toast.LENGTH_SHORT).show()
             }
 
