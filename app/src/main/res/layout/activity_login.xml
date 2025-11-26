@@ -42,10 +42,19 @@
         android:id="@+id/btnEntrar"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="8dp"
         android:text="Entrar"
         android:textSize="16sp"
         style="@style/Widget.Material3.Button" />
+
+    <TextView
+        android:id="@+id/txtEsqueciSenha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="Esqueci minha senha"
+        android:textColor="@color/design_default_color_primary"
+        android:padding="8dp" />
 
     <TextView
         android:id="@+id/txtCadastrar"
