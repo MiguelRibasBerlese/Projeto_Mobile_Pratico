@@ -12,10 +12,15 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import kotlinx.coroutines.launch
 import com.example.projetopratico_mobile1.R
 import com.example.projetopratico_mobile1.data.InMemoryStore
 import com.example.projetopratico_mobile1.data.models.ShoppingList
+import com.example.projetopratico_mobile1.data.repo.InMemoryListRepository
 import com.example.projetopratico_mobile1.databinding.ActivityHomeBinding
 import com.example.projetopratico_mobile1.ui.listdetail.ListDetailActivity
 import com.example.projetopratico_mobile1.ui.listform.ListFormActivity
@@ -29,14 +34,19 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var adapter: ListaComprasAdapter
-    private val viewModel: HomeViewModel by viewModels()
+
+    // ViewModel com factory para injeção de dependência
+    private val viewModel: HomeViewModel by viewModels {
+        ListViewModelFactory(InMemoryListRepository())
+    }
 
     // launcher para resultado do formulário de lista
     private val formLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
+        // Com MVVM, não precisa reload manual - o Flow atualiza automaticamente
         if (result.resultCode == Activity.RESULT_OK) {
-            carregarListas()
+            // Dados já atualizados via Flow
         }
     }
 
@@ -49,7 +59,9 @@ class HomeActivity : AppCompatActivity() {
         configurarRecyclerView()
         configurarBusca()
         configurarFab()
-        carregarListas()
+
+        // Observar mudanças de estado via Flow
+        observarEstado()
     }
 
     override fun onStart() {
@@ -62,6 +74,9 @@ class HomeActivity : AppCompatActivity() {
             finish()
             return
         }
+
+        // Cria dados de exemplo se necessário (para testes da Fase 1)
+        InMemoryStore.criarDadosExemplo()
     }
 
     private fun configurarToolbar() {
@@ -86,7 +101,8 @@ class HomeActivity : AppCompatActivity() {
             override fun onQueryTextSubmit(query: String?): Boolean = false
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                filtrarListas(newText.orEmpty())
+                // Envia query para ViewModel que atualiza o Flow
+                viewModel.setQuery(newText.orEmpty())
                 return true
             }
         })
@@ -98,39 +114,22 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-    private fun carregarListas() {
-        try {
-            val listas = InMemoryStore.listasView
-            adapter.submitList(listas)
-            atualizarEmptyState(listas)
-        } catch (e: Exception) {
-            // em caso de erro, mostra lista vazia
-            adapter.submitList(emptyList())
-            atualizarEmptyState(true)
-            Toast.makeText(this, "Erro ao carregar listas", Toast.LENGTH_SHORT).show()
-        }
-    }
+    /**
+     * Observa mudanças de estado do ViewModel usando Flow
+     * Com lifecycle safety (repeatOnLifecycle)
+     */
+    private fun observarEstado() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    // Atualizar adapter com listas filtradas
+                    adapter.submitList(state.filteredLists)
 
-    private fun filtrarListas(query: String) {
-        try {
-            val listas = if (query.isEmpty()) {
-                InMemoryStore.listasView
-            } else {
-                InMemoryStore.listasView.filter {
-                    it.titulo.contains(query, ignoreCase = true)
+                    // Atualizar empty state
+                    atualizarEmptyState(state.filteredLists.isEmpty())
                 }
             }
-            adapter.submitList(listas)
-            atualizarEmptyState(listas)
-        } catch (e: Exception) {
-            adapter.submitList(emptyList())
-            atualizarEmptyState(true)
-            Toast.makeText(this, "Erro ao filtrar listas", Toast.LENGTH_SHORT).show()
         }
-    }
-
-    private fun atualizarEmptyState(listas: List<ShoppingList>) {
-        atualizarEmptyState(listas.isEmpty())
     }
 
     private fun atualizarEmptyState(isEmpty: Boolean) {
@@ -160,8 +159,8 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun excluirLista(lista: ShoppingList) {
-        InMemoryStore.removerLista(lista.id)
-        carregarListas()
+        // Usar ViewModel que atualiza o Flow automaticamente
+        viewModel.deleteList(lista.id)
 
         Snackbar.make(binding.root, "Lista excluída", Snackbar.LENGTH_SHORT).show()
     }
@@ -195,8 +194,5 @@ class HomeActivity : AppCompatActivity() {
         finish()
     }
 
-    override fun onResume() {
-        super.onResume()
-        carregarListas()
-    }
+    // onResume removido - com MVVM e Flow, as atualizações são automáticas
 }
