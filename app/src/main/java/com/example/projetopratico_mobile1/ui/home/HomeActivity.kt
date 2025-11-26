@@ -26,6 +26,7 @@ import com.example.projetopratico_mobile1.ui.listdetail.ListDetailActivity
 import com.example.projetopratico_mobile1.ui.listform.ListFormActivity
 import com.example.projetopratico_mobile1.ui.login.LoginActivity
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
 
 /**
  * Tela principal que mostra as listas de compras do usuário
@@ -66,8 +67,10 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        // Auth guard - verifica se usuário está logado
-        if (InMemoryStore.currentUser == null) {
+        // Auth Guard - verifica se usuário está logado com Firebase Auth
+        val auth = FirebaseAuth.getInstance()
+        if (auth.currentUser == null) {
+            // Não logado - redireciona para LoginActivity
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
@@ -187,7 +190,10 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun logout() {
-        InMemoryStore.currentUser = null
+        // Logout do Firebase Auth
+        FirebaseAuth.getInstance().signOut()
+
+        // Redirecionar para LoginActivity com flags para limpar pilha
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
