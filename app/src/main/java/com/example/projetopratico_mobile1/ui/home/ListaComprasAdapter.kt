@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.projetopratico_mobile1.R
 import com.example.projetopratico_mobile1.data.models.ShoppingList
 import com.example.projetopratico_mobile1.databinding.RowListaBinding
+import com.example.projetopratico_mobile1.util.LocalImageStore
 
 /**
  * Adapter para mostrar as listas de compras com ações
@@ -37,18 +38,14 @@ class ListaComprasAdapter(
             binding.txtTitulo.text = lista.titulo
             binding.txtQuantidadeItens.text = "${lista.itens.size} itens"
 
-            // Configurar imagem da lista - placeholder conforme especificação
-            val uri = lista.imagemUri
-            if (!uri.isNullOrBlank()) {
-                try {
-                    binding.imgLista.setImageURI(Uri.parse(uri))
-                    binding.imgLista.scaleType = ImageView.ScaleType.CENTER_CROP
-                } catch (e: Exception) {
-                    // URI inválida, usar placeholder
-                    binding.imgLista.setImageResource(android.R.drawable.ic_menu_gallery)
-                    binding.imgLista.scaleType = ImageView.ScaleType.CENTER_CROP
-                }
+            // Configurar imagem da lista usando LocalImageStore
+            if (LocalImageStore.exists(binding.root.context, lista.id)) {
+                // Imagem existe localmente - carregar do arquivo
+                val imageFile = LocalImageStore.fileForList(binding.root.context, lista.id)
+                binding.imgLista.setImageURI(Uri.fromFile(imageFile))
+                binding.imgLista.scaleType = ImageView.ScaleType.CENTER_CROP
             } else {
+                // Sem imagem - usar placeholder
                 binding.imgLista.setImageResource(android.R.drawable.ic_menu_gallery)
                 binding.imgLista.scaleType = ImageView.ScaleType.CENTER_CROP
             }
