@@ -20,7 +20,7 @@ import kotlinx.coroutines.launch
 import com.example.projetopratico_mobile1.R
 import com.example.projetopratico_mobile1.data.InMemoryStore
 import com.example.projetopratico_mobile1.data.models.ShoppingList
-import com.example.projetopratico_mobile1.data.repo.InMemoryListRepository
+import com.example.projetopratico_mobile1.data.repo.RepoProvider
 import com.example.projetopratico_mobile1.databinding.ActivityHomeBinding
 import com.example.projetopratico_mobile1.ui.listdetail.ListDetailActivity
 import com.example.projetopratico_mobile1.ui.listform.ListFormActivity
@@ -36,9 +36,9 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeBinding
     private lateinit var adapter: ListaComprasAdapter
 
-    // ViewModel com factory para injeção de dependência
+    // ViewModel com factory para injeção de dependência - usa RepoProvider
     private val viewModel: HomeViewModel by viewModels {
-        ListViewModelFactory(InMemoryListRepository())
+        ListViewModelFactory(RepoProvider.provideListRepository(this))
     }
 
     // launcher para resultado do formulário de lista
