@@ -8,66 +8,78 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.projetopratico_mobile1.data.InMemoryStore
+import kotlinx.coroutines.launch
 import com.example.projetopratico_mobile1.data.models.Item
+import com.example.projetopratico_mobile1.data.repo.RepoProvider
 import com.example.projetopratico_mobile1.databinding.ActivityListDetailBinding
 import com.example.projetopratico_mobile1.ui.itemform.ItemFormActivity
-import com.example.projetopratico_mobile1.util.GroupingUtils
 import com.google.android.material.snackbar.Snackbar
 
 /**
  * Tela que mostra os itens de uma lista específica
  * Itens agrupados por categoria com seção de comprados separada
+ * Usa MVVM com Firestore (logado) ou InMemory (offline)
  */
 class ListDetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityListDetailBinding
     private lateinit var adapter: ItensAdapter
-    private val viewModel: ListDetailViewModel by viewModels()
     private var listaId: String? = null
-    private var termoBusca: String = ""
+
+    // ViewModel com factory para injeção de repositório
+    private val viewModel: ItemListViewModel by viewModels {
+        ItemListViewModelFactory(
+            repository = RepoProvider.provideItemRepository(),
+            listId = listaId!!
+        )
+    }
 
     // launcher para resultado do formulário de item
     private val formLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
+        // Com MVVM, não precisa reload manual - o Flow atualiza automaticamente
         if (result.resultCode == Activity.RESULT_OK) {
-            carregarItens()
+            // Dados já atualizados via Flow do repositório
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityListDetailBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
+        // IMPORTANTE: definir listaId ANTES de inicializar ViewModel
         listaId = intent.getStringExtra("LISTA_ID")
         if (listaId == null) {
             finish()
             return
         }
 
+        binding = ActivityListDetailBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
         configurarToolbar()
         configurarRecyclerView()
         configurarBusca()
         configurarFab()
-        carregarItens()
+
+        // Observar mudanças de estado via Flow com lifecycle safety
+        observarEstado()
     }
 
     private fun configurarToolbar() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-
-        // mostra nome da lista na toolbar
-        val lista = InMemoryStore.buscarLista(listaId!!)
-        supportActionBar?.title = lista?.titulo ?: "Lista"
+        supportActionBar?.title = "Itens da Lista"
     }
 
     private fun configurarRecyclerView() {
         adapter = ItensAdapter(
             aoClicarItem = { item -> editarItem(item) },
-            aoToggleComprado = { item -> toggleComprado(item) }
+            aoToggleComprado = { item -> viewModel.togglePurchased(item) }
         )
 
         binding.recycler.layoutManager = LinearLayoutManager(this)
@@ -79,8 +91,8 @@ class ListDetailActivity : AppCompatActivity() {
             override fun onQueryTextSubmit(query: String?): Boolean = false
 
             override fun onQueryTextChange(newText: String?): Boolean {
-                termoBusca = newText.orEmpty()
-                carregarItens()
+                // Envia query para ViewModel que atualiza o Flow
+                viewModel.setQuery(newText.orEmpty())
                 return true
             }
         })
@@ -92,27 +104,23 @@ class ListDetailActivity : AppCompatActivity() {
         }
     }
 
-    private fun carregarItens() {
-        val lista = InMemoryStore.buscarLista(listaId!!) ?: return
+    /**
+     * Observa mudanças de estado do ViewModel usando Flow
+     * Com lifecycle safety (repeatOnLifecycle)
+     */
+    private fun observarEstado() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    // Converte dados agrupados em lista de RowItems para o adapter
+                    val rowItems = AdapterDataConverter.convertToRowItems(state.groupedItems)
+                    adapter.submitList(rowItems)
 
-        // filtra itens se tem busca
-        val itensFiltrados = if (termoBusca.isEmpty()) {
-            lista.itens
-        } else {
-            // filtra apenas não comprados por nome
-            lista.itens.filter { !it.comprado && it.nome.contains(termoBusca, ignoreCase = true) }
+                    // Atualizar empty state
+                    atualizarEmptyState(state.allItems.isEmpty())
+                }
+            }
         }
-
-        // se não tem busca, mostra agrupado com comprados
-        val dadosAgrupados = if (termoBusca.isEmpty()) {
-            GroupingUtils.buildDataWithComprados(lista.itens)
-        } else {
-            // se tem busca, só mostra não comprados agrupados
-            GroupingUtils.buildGroupedData(itensFiltrados)
-        }
-
-        adapter.submitList(dadosAgrupados)
-        atualizarEmptyState(dadosAgrupados.isEmpty())
     }
 
     private fun atualizarEmptyState(isEmpty: Boolean) {
@@ -130,20 +138,7 @@ class ListDetailActivity : AppCompatActivity() {
         formLauncher.launch(intent)
     }
 
-    private fun toggleComprado(item: Item) {
-        val lista = InMemoryStore.buscarLista(listaId!!) ?: return
 
-        // encontra o item na lista e alterna estado
-        val itemIndex = lista.itens.indexOfFirst { it.id == item.id }
-        if (itemIndex != -1) {
-            lista.itens[itemIndex] = item.copy(comprado = !item.comprado)
-
-            val mensagem = if (!item.comprado) "Item marcado como comprado" else "Item desmarcado"
-            Snackbar.make(binding.root, mensagem, Snackbar.LENGTH_SHORT).show()
-
-            carregarItens() // recarrega para agrupar novamente
-        }
-    }
 
     override fun onSupportNavigateUp(): Boolean {
         finish()
