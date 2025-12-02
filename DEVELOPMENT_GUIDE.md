@@ -6,7 +6,7 @@
 ```bash
 # Clone o repositório
 git clone <repository-url>
-cd ProjetoPratico_Mobile12
+cd Projeto_Mobile_Pratico
 
 # Abrir no Android Studio
 # File -> Open -> Selecionar a pasta do projeto

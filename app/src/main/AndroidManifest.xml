@@ -12,9 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ProjetoPratico_Mobile1">
 
-        <!-- Activity de Login - LAUNCHER -->
+        <!-- Activity Principal (Home) - LAUNCHER -->
         <activity
-            android:name=".ui.login.LoginActivity"
+            android:name=".ui.home.HomeActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,14 +22,14 @@
             </intent-filter>
         </activity>
 
+        <!-- Activity de Login -->
+        <activity
+            android:name=".ui.login.LoginActivity"
+            android:exported="false" />
+
         <!-- Activity de Cadastro -->
         <activity
             android:name=".ui.login.RegisterActivity"
-            android:exported="false" />
-
-        <!-- Activity Principal (Home) -->
-        <activity
-            android:name=".ui.home.HomeActivity"
             android:exported="false" />
 
         <!-- Activity de Formulário de Lista -->

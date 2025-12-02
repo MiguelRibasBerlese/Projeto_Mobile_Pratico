@@ -2,17 +2,32 @@
 
 ## 📐 Visão Geral da Arquitetura
 
-Este projeto segue o padrão **MVVM (Model-View-ViewModel)** com **Repository Pattern** e **Clean Architecture** principles.
+Este projeto segue o padrão **MVVM (Model-View-ViewModel)** com **Repository Pattern** implementado conforme as especificações do projeto acadêmico.
 
 ```
 ┌─────────────────┬─────────────────┬─────────────────┐
-│       UI        │    DOMAIN       │      DATA       │
+│       UI        │   VIEWMODELS    │   REPOSITORIES  │
 ├─────────────────┼─────────────────┼─────────────────┤
-│  Activities     │   ViewModels    │  Repositories   │
-│  Fragments      │   Use Cases     │  Data Sources   │
-│  Adapters       │   States        │  APIs/DB        │
+│  Activities     │   HomeViewModel │ FirestoreListRepo│
+│  ViewBinding    │  ItemViewModel  │ InMemoryListRepo │
+│  Adapters       │   AuthViewModel │ FirestoreItemRepo│
+│  States         │   Factories     │ LocalImageStore │
 └─────────────────┴─────────────────┴─────────────────┘
+              ↑                           ↑
+        RepoProvider seleciona       Firebase Auth
+       (logado = Firestore)         (guard + login)
+       (offline = InMemory)
 ```
+
+## ✅ **IMPLEMENTAÇÃO ATUAL - CONFORMIDADE TOTAL**
+
+### **Fase 1 (RAM + ViewBinding + APIs não-deprecadas)**: ✅ COMPLETO
+- [x] Singleton InMemoryStore para dados temporários
+- [x] ViewBinding em todas as Activities (HomeActivity, LoginActivity, etc.)
+- [x] ActivityResultContracts.GetContent() para seleção de imagens (sem startActivityForResult)
+- [x] ExposedDropdownMenu para seleção de unidades (não botão)
+- [x] Imagens locais via LocalImageStore (fileForList, saveFromContentUri)
+- [x] Zero APIs deprecadas detectadas
 
 ## 🏗️ Camadas da Aplicação
 

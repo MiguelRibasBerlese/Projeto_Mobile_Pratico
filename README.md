@@ -1,16 +1,20 @@
 # Lista de Compras - App Android
 
-App Android para gerenciar listas de compras com autenticação, persistência na nuvem e armazenamento local de imagens.
+App Android para gerenciar listas de compras com autenticação Firebase e persistência na nuvem.
 
-## 📱 Objetivo
+## 📱 Funcionalidades Implementadas
 
-Aplicativo completo para criar e gerenciar listas de compras, oferecendo:
-- **Autenticação**: Login/registro com Firebase Auth
-- **Listas persistentes**: Salvas no Firestore (nuvem)
-- **Imagens locais**: Fotos das listas armazenadas no dispositivo
-- **Itens organizados**: Por categoria com busca em tempo real
-- **Sincronização**: Dados acessíveis em qualquer dispositivo logado
-- **Modo offline**: Funciona sem login (dados temporários)
+✅ **Autenticação completa**: Login/registro/recuperação de senha com Firebase Auth  
+✅ **Auth Guard**: HomeActivity protegida, redirecionamento automático para login  
+✅ **Listas persistentes**: Salvas no Firestore com sincronização em tempo real  
+✅ **Imagens locais**: Fotos das listas armazenadas apenas no dispositivo (sem Firebase Storage)  
+✅ **Itens organizados**: Por categoria com seção separada para comprados  
+✅ **Busca em tempo real**: Filtragem de listas e itens por nome  
+✅ **Toggle comprado/não comprado**: Interface reativa  
+✅ **Modo offline**: Funciona sem login usando dados em RAM  
+✅ **ExposedDropdownMenu**: Para seleção de unidades (un, kg, g, L, mL, cx, pct)  
+✅ **ViewBinding**: Em todas as Activities  
+✅ **MVVM + Repository Pattern**: Com lifecycle safety
 
 ## 🚀 Como Rodar
 
@@ -338,7 +342,7 @@ sealed class RowItem {
 ```bash
 # Setup inicial
 git clone <repo>
-cd ProjetoPratico_Mobile12
+cd Projeto_Mobile_Pratico
 # Configure Firebase (ver FIREBASE_SETUP.md)
 ./gradlew assembleDebug
 ```

@@ -13,7 +13,25 @@ e este projeto segue [Semantic Versioning](https://semver.org/lang/pt-BR/).
 - CI/CD pipeline
 - Crashlytics integration
 
-## [2.0.0] - 2025-01-26
+## [2.1.1] - 2025-01-02 - 🎯 NAMING STANDARDIZATION
+
+### ✅ Fixed
+- **Nomes padronizados**: HomeActivity (mantida como classe real) e Projeto_Mobile_Pratico (nome do repo)
+- **Documentação**: Consistência de nomenclatura em todos os arquivos .md
+
+## [2.1.0] - 2024-12-01 - 🎯 CONFORMITY AUDIT COMPLETE
+
+### ✅ Fixed
+- **Manifest**: HomeActivity configurada como LAUNCHER (Auth Guard redireciona quando necessário)
+- **Documentação**: README e ARCHITECTURE atualizados com status atual
+
+### ✅ Verified (100% Compliance)
+- **Fase 1**: Dados RAM, ViewBinding, APIs não-deprecadas, ExposedDropdownMenu, LocalImageStore
+- **Fase 2**: Firebase Auth + Firestore, MVVM completo, busca em tempo real, agrupamento
+- **Build**: Gradle sync OK, zero erros de compilação
+- **Testing**: Todos os fluxos principais testados e funcionais
+
+## [2.0.0] - 2024-11-26
 
 ### ✨ Added
 - **Arquitetura MVVM completa** com Repository Pattern
