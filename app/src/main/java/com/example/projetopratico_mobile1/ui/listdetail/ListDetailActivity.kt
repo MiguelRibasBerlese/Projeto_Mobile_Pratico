@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -30,13 +31,8 @@ class ListDetailActivity : AppCompatActivity() {
     private lateinit var adapter: ItensAdapter
     private var listaId: String? = null
 
-    // ViewModel com factory para injeção de repositório
-    private val viewModel: ItemListViewModel by viewModels {
-        ItemListViewModelFactory(
-            repository = RepoProvider.provideItemRepository(),
-            listId = listaId!!
-        )
-    }
+    // ViewModel será inicializado após obter listaId
+    private lateinit var viewModel: ItemListViewModel
 
     // launcher para resultado do formulário de item
     private val formLauncher = registerForActivityResult(
@@ -57,6 +53,13 @@ class ListDetailActivity : AppCompatActivity() {
             finish()
             return
         }
+
+        // Inicializar ViewModel após obter listaId
+        val factory = ItemListViewModelFactory(
+            repository = RepoProvider.provideItemRepository(),
+            listId = listaId!!
+        )
+        viewModel = ViewModelProvider(this, factory)[ItemListViewModel::class.java]
 
         binding = ActivityListDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)

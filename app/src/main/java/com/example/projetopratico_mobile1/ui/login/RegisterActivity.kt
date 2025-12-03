@@ -30,9 +30,9 @@ class RegisterActivity : AppCompatActivity() {
 
             when (val result = AuthManager.signUp(nome, email, senha, confirma)) {
                 is AuthResult.Ok -> {
-                    // Cadastro bem-sucedido - criar dados de exemplo e navegar para HomeActivity
+                    // Cadastro bem-sucedido - navegar para HomeActivity (sem dados de exemplo)
                     binding.root.showToast("Conta criada com sucesso!")
-                    InMemoryStore.criarDadosExemplo()
+                    InMemoryStore.criarDadosExemplo() // Inicializa estrutura vazia para o usuário
 
                     val intent = Intent(this, HomeActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

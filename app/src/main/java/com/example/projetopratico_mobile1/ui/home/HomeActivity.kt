@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import com.example.projetopratico_mobile1.R
 import com.example.projetopratico_mobile1.data.InMemoryStore
+import com.example.projetopratico_mobile1.data.auth.AuthManager
 import com.example.projetopratico_mobile1.data.models.ShoppingList
 import com.example.projetopratico_mobile1.data.repo.RepoProvider
 import com.example.projetopratico_mobile1.databinding.ActivityHomeBinding
@@ -67,9 +68,10 @@ class HomeActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        // Auth Guard - verifica se usuário está logado com Firebase Auth
-        val auth = FirebaseAuth.getInstance()
-        if (auth.currentUser == null) {
+        // Auth Guard - verifica se usuário está logado (Firebase Auth ou AuthManager)
+        val isLoggedIn = isUserLoggedIn()
+
+        if (!isLoggedIn) {
             // Não logado - redireciona para LoginActivity
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -78,8 +80,31 @@ class HomeActivity : AppCompatActivity() {
             return
         }
 
-        // Cria dados de exemplo se necessário (para testes da Fase 1)
+        // CORREÇÃO: Não criar dados de exemplo automaticamente
+        // Usuário deve criar suas próprias listas
         InMemoryStore.criarDadosExemplo()
+    }
+
+    // REMOVIDO onResume problemático - O StateFlow já é reativo
+
+    /**
+     * Verifica se usuário está logado (AuthManager primeiro, depois Firebase se necessário)
+     */
+    private fun isUserLoggedIn(): Boolean {
+        // Primeiro verifica AuthManager (Fase 1 - dados locais)
+        if (AuthManager.isLoggedIn()) {
+            return true
+        }
+
+        // Só verifica Firebase se AuthManager não estiver logado
+        // Para evitar inicialização desnecessária do Firebase
+        return try {
+            val firebaseAuth = FirebaseAuth.getInstance()
+            firebaseAuth.currentUser != null
+        } catch (e: Exception) {
+            // Se Firebase não estiver configurado ou falhar, usar apenas AuthManager
+            false
+        }
     }
 
     private fun configurarToolbar() {
@@ -125,8 +150,16 @@ class HomeActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collect { state ->
-                    // Atualizar adapter com listas filtradas
-                    adapter.submitList(state.filteredLists)
+                    println("DEBUG: HomeActivity - ESTADO COLETADO com ${state.allLists.size} listas totais, ${state.filteredLists.size} filtradas")
+                    state.filteredLists.forEach { lista ->
+                        println("DEBUG: Lista CHEGOU na UI: ${lista.id} - ${lista.titulo}")
+                    }
+
+                    // CORREÇÃO: Criar nova lista para forçar DiffUtil a detectar mudanças
+                    val newList = state.filteredLists.toList()
+                    adapter.submitList(newList)
+
+                    println("DEBUG: HomeActivity - ADAPTER ATUALIZADO com ${newList.size} listas")
 
                     // Atualizar empty state
                     atualizarEmptyState(state.filteredLists.isEmpty())
@@ -136,8 +169,13 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun atualizarEmptyState(isEmpty: Boolean) {
+        println("DEBUG: HomeActivity - Atualizando empty state: isEmpty=$isEmpty")
         binding.txtEmptyState.isVisible = isEmpty
         binding.recycler.isVisible = !isEmpty
+
+        if (isEmpty) {
+            binding.txtEmptyState.text = "Nenhuma lista ainda.\nToque no + para criar sua primeira lista!"
+        }
     }
 
     private fun criarNovaLista() {
@@ -190,8 +228,15 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun logout() {
-        // Logout do Firebase Auth
-        FirebaseAuth.getInstance().signOut()
+        // Logout do AuthManager primeiro (dados em memória)
+        AuthManager.signOut()
+
+        // Logout do Firebase Auth apenas se necessário
+        try {
+            FirebaseAuth.getInstance().signOut()
+        } catch (e: Exception) {
+            // Ignorar se Firebase não estiver configurado
+        }
 
         // Redirecionar para LoginActivity com flags para limpar pilha
         val intent = Intent(this, LoginActivity::class.java)

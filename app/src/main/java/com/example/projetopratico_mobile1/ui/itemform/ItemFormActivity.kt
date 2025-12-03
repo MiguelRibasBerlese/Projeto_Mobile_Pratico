@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
@@ -17,6 +18,7 @@ import com.example.projetopratico_mobile1.data.InMemoryStore
 import com.example.projetopratico_mobile1.data.models.Item
 import com.example.projetopratico_mobile1.data.models.Categoria
 import com.example.projetopratico_mobile1.data.repo.InMemoryItemRepository
+import com.example.projetopratico_mobile1.data.repo.RepoProvider
 import com.example.projetopratico_mobile1.databinding.ActivityItemFormBinding
 import java.util.UUID
 
@@ -31,7 +33,7 @@ class ItemFormActivity : AppCompatActivity() {
     private var categoriaSelecionada: Categoria? = null
     private var unidadeSelecionada: String = ""
 
-    // ViewModel para gerenciar itens (será inicializado após obter listaId)
+    // ViewModel será inicializado após obter listaId
     private lateinit var itemViewModel: ItemViewModel
 
     // Opções de unidade conforme especificação
@@ -51,7 +53,8 @@ class ItemFormActivity : AppCompatActivity() {
         }
 
         // Inicializar ViewModel após obter listaId
-        inicializarViewModel()
+        val factory = ItemViewModelFactory(RepoProvider.provideItemRepository(), listaId!!)
+        itemViewModel = ViewModelProvider(this, factory)[ItemViewModel::class.java]
 
         configurarTela()
         configurarSpinner()
@@ -59,10 +62,6 @@ class ItemFormActivity : AppCompatActivity() {
         carregarDados()
     }
 
-    private fun inicializarViewModel() {
-        val factory = ItemViewModelFactory(InMemoryItemRepository(), listaId!!)
-        itemViewModel = factory.create(ItemViewModel::class.java)
-    }
 
     private fun configurarTela() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)

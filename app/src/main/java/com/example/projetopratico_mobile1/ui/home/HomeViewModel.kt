@@ -5,12 +5,13 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import com.example.projetopratico_mobile1.data.models.ShoppingList
+import com.example.projetopratico_mobile1.data.repo.InMemoryListRepository
 import com.example.projetopratico_mobile1.data.repo.ListRepository
 
 /**
  * UI state para a tela de listas
  */
-data class ListUiState(
+data class HomeUiState(
     val allLists: List<ShoppingList> = emptyList(),
     val filteredLists: List<ShoppingList> = emptyList(),
     val query: String = "",
@@ -20,9 +21,15 @@ data class ListUiState(
 /**
  * ViewModel para gerenciar dados da HomeActivity usando MVVM
  */
-class ListViewModel(
+class HomeViewModel(
     private val repository: ListRepository
 ) : ViewModel() {
+
+    init {
+        if (repository is InMemoryListRepository) {
+            println("DEBUG: HomeViewModel - Usando repositório: ${repository.getInstanceId()}")
+        }
+    }
 
     // Estado da busca controlado internamente
     private val _query = MutableStateFlow("")
@@ -32,6 +39,11 @@ class ListViewModel(
         repository.observeLists(),
         _query
     ) { lists, query ->
+        println("DEBUG: HomeViewModel - COMBINE ACIONADO com ${lists.size} listas do repositório")
+        lists.forEach { lista ->
+            println("DEBUG: Lista RECEBIDA no ViewModel: ${lista.id} - ${lista.titulo}")
+        }
+
         val filtered = if (query.isEmpty()) {
             lists
         } else {
@@ -40,18 +52,27 @@ class ListViewModel(
             }
         }
 
-        ListUiState(
+        println("DEBUG: HomeViewModel - ${filtered.size} listas FILTRADAS (query: '$query')")
+        filtered.forEach { lista ->
+            println("DEBUG: Lista FILTRADA: ${lista.id} - ${lista.titulo}")
+        }
+
+        val newState = HomeUiState(
             allLists = lists,
             filteredLists = filtered,
             query = query
         )
+
+        println("DEBUG: HomeViewModel - NOVO ESTADO criado com ${newState.filteredLists.size} listas filtradas")
+
+        newState
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = ListUiState()
+        initialValue = HomeUiState()
     )
 
-    val uiState: StateFlow<ListUiState> = _uiState
+    val uiState: StateFlow<HomeUiState> = _uiState
 
     /**
      * Atualiza a query de busca
@@ -64,8 +85,43 @@ class ListViewModel(
      * Cria nova lista
      */
     fun createList(title: String, imageUri: String? = null) {
+        println("DEBUG: HomeViewModel - createList() INICIADO com title='$title', imageUri='$imageUri'")
         viewModelScope.launch {
-            repository.create(title, imageUri)
+            try {
+                println("DEBUG: HomeViewModel - Chamando repository.create()")
+                val newList = repository.create(title, imageUri)
+                println("DEBUG: HomeViewModel - repository.create() EXECUTADO com sucesso, ID: ${newList.id}")
+            } catch (e: Exception) {
+                println("DEBUG: HomeViewModel - ERRO no repository.create(): ${e.message}")
+                e.printStackTrace()
+            }
+        }
+        println("DEBUG: HomeViewModel - createList() FINALIZADO")
+    }
+
+    /**
+     * Cria nova lista e retorna a lista criada (para uso com imagem)
+     */
+    suspend fun createListAndReturn(title: String, imageUri: String? = null): ShoppingList? {
+        println("DEBUG: HomeViewModel - createListAndReturn() INICIADO com title='$title', imageUri='$imageUri'")
+        return try {
+            println("DEBUG: HomeViewModel - Chamando repository.create()")
+            val newList = repository.create(title, imageUri)
+            println("DEBUG: HomeViewModel - repository.create() EXECUTADO com sucesso, ID: ${newList.id}")
+            newList
+        } catch (e: Exception) {
+            println("DEBUG: HomeViewModel - ERRO no repository.create(): ${e.message}")
+            e.printStackTrace()
+            null
+        }
+    }
+
+    /**
+     * Atualiza uma lista existente
+     */
+    fun updateList(list: ShoppingList) {
+        viewModelScope.launch {
+            repository.update(list)
         }
     }
 
