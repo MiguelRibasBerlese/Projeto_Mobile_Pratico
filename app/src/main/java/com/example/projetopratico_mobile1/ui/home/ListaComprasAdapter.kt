@@ -35,17 +35,24 @@ class ListaComprasAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(lista: ShoppingList) {
+            println("DEBUG: ListaComprasAdapter - BINDING lista: ${lista.id} - ${lista.titulo}")
             binding.txtTitulo.text = lista.titulo
             binding.txtQuantidadeItens.text = "${lista.itens.size} itens"
 
             // Configurar imagem da lista usando LocalImageStore
+            println("DEBUG: ListaComprasAdapter - Verificando imagem para lista ${lista.id}")
+            println("DEBUG: ListaComprasAdapter - imagemUri da lista: '${lista.imagemUri}'")
+
             if (LocalImageStore.exists(binding.root.context, lista.id)) {
                 // Imagem existe localmente - carregar do arquivo
+                println("DEBUG: ListaComprasAdapter - Imagem encontrada no LocalImageStore")
                 val imageFile = LocalImageStore.fileForList(binding.root.context, lista.id)
+                println("DEBUG: ListaComprasAdapter - Carregando imagem de: ${imageFile.absolutePath}")
                 binding.imgLista.setImageURI(Uri.fromFile(imageFile))
                 binding.imgLista.scaleType = ImageView.ScaleType.CENTER_CROP
             } else {
                 // Sem imagem - usar placeholder
+                println("DEBUG: ListaComprasAdapter - Imagem NÃO encontrada no LocalImageStore, usando placeholder")
                 binding.imgLista.setImageResource(android.R.drawable.ic_menu_gallery)
                 binding.imgLista.scaleType = ImageView.ScaleType.CENTER_CROP
             }
@@ -68,11 +75,15 @@ class ListaComprasAdapter(
     // DiffUtil para o RecyclerView não ficar piscando
     companion object DiffCallback : DiffUtil.ItemCallback<ShoppingList>() {
         override fun areItemsTheSame(oldItem: ShoppingList, newItem: ShoppingList): Boolean {
-            return oldItem.id == newItem.id
+            val result = oldItem.id == newItem.id
+            println("DEBUG: ListaComprasAdapter - areItemsTheSame: ${oldItem.id} == ${newItem.id} = $result")
+            return result
         }
 
         override fun areContentsTheSame(oldItem: ShoppingList, newItem: ShoppingList): Boolean {
-            return oldItem == newItem
+            val result = oldItem.titulo == newItem.titulo && oldItem.itens.size == newItem.itens.size
+            println("DEBUG: ListaComprasAdapter - areContentsTheSame: ${oldItem.titulo} = $result")
+            return result
         }
     }
 }
